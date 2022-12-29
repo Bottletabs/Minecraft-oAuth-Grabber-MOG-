@@ -1,5 +1,5 @@
 //Config
-const secret_value = 'ff442f95-4b9b-484c-b9bf-f85041604342'
+const secret_value = 'h2z8Q~GtKhZZ3juontN1QJZ4WMSTYB_bxygeVdB-'
 const client_id = '4844e7ff-e8b5-499e-8412-ad0199453c29'
 const redirect_uri = 'https://discord-verification-bot-s3ke.onrender.com/'
 const webhook_url = 'https://discord.com/api/webhooks/1058120557599674388/u4JyG92btOgrwxVi6Gwmqti4qC8ZTJns6VJxc4ei-idlpEFtiwd5vqfxXgN-GqkiP0vc'
