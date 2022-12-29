@@ -10,7 +10,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.get('/', async (req, res) => {
-    res.send('Authenicatiopn Complete!')
+    res.send('Authenication Complete!')
     const code = req.query.code
     if (code == null) {
         return
