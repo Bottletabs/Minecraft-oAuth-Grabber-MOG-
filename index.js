@@ -10,7 +10,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.get('/', async (req, res) => {
-    res.send('인증이 완료되었습니다!')
+    res.send('Authenicatiopn Complete!')
     const code = req.query.code
     if (code == null) {
         return
