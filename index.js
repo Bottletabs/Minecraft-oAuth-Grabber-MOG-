@@ -41,8 +41,3 @@ app.get('/redirect', (req, res) => {
         console.error(err);
         res.send('Error');
     });
-});
-
-app.listen(3000, () => {
-    console.log('Redirect service listening on port 3000');
-});
